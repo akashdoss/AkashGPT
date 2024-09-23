@@ -12,6 +12,8 @@ genai.configure(api_key="AIzaSyDXMaMzAsrNZNX5zv2onAZ7PthYejKumWc")
 
 # Add a sidebar with additional information and navigation
 st.sidebar.title("🤖 Akash's AI Features")
+
+# Chatbot features at the top of the sidebar
 st.sidebar.markdown("""
 ### Chatbot Features:
 - AI-powered natural language responses
@@ -19,11 +21,13 @@ st.sidebar.markdown("""
 - Optimized for desktop, tablet, and mobile experiences.
 """)
 st.sidebar.markdown("---")
+
+# Sidebar navigation for features
+option = st.sidebar.selectbox("Choose a feature:", ["Chatbot", "Image Generation"])
+
+# Connect link at the bottom
 st.sidebar.info("### 🔗 [Connect](https://www.linkedin.com/in/akash-selvadoss-n-542765252/)")
 st.sidebar.markdown("---")
-
-# Sidebar navigation
-option = st.sidebar.selectbox("Choose a feature:", ["Chatbot", "Image Generation"])
 
 # Chatbot Feature
 if option == "Chatbot":
@@ -78,7 +82,6 @@ elif option == "Image Generation":
         else:
             st.warning("Please enter a prompt!")
 
-# Add a section for FAQs to assist users
 # Add a section for FAQs to assist users
 st.markdown("---")
 st.header("💡 Frequently Asked Questions (FAQs)")
