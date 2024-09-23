@@ -1,15 +1,17 @@
 import streamlit as st
+import requests
+import io
+from PIL import Image
 import google.generativeai as genai
 
 # Set page configuration with title, icon, and layout
-st.set_page_config(page_title="Akash's GPT Chatbot", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="Akash's AI Features", page_icon="🤖", layout="wide")
 
-# Configure the API key
+# Configure the API key for the chatbot
 genai.configure(api_key="AIzaSyDXMaMzAsrNZNX5zv2onAZ7PthYejKumWc")
 
 # Add a sidebar with additional information and navigation
-st.sidebar.title("🤖 Akash's GPT Chatbot")
- # Add your logo here
+st.sidebar.title("🤖 Akash's AI Features")
 st.sidebar.markdown("""
 ### Chatbot Features:
 - AI-powered natural language responses
@@ -20,41 +22,69 @@ st.sidebar.markdown("---")
 st.sidebar.info("### 🔗 [Connect](https://www.linkedin.com/in/akash-selvadoss-n-542765252/)")
 st.sidebar.markdown("---")
 
-# Main page title and description
-st.title("Welcome to Akash's GPT Chatbot")
-st.markdown("""
-### 🤖 Ask any question, and get instant AI-powered answers!
-This chatbot is powered by **Gemini GPT** to provide smart responses in real-time.
-""")
+# Sidebar navigation
+option = st.sidebar.selectbox("Choose a feature:", ["Chatbot", "Image Generation"])
 
-# Input area for the user's question
-text = st.text_area("Enter Your Question Here", height=150, placeholder="Type your question...")
+# Chatbot Feature
+if option == "Chatbot":
+    # Main page title and description for the chatbot
+    st.title("Welcome to Akash's GPT Chatbot")
+    st.markdown("""
+    ### 🤖 Ask any question, and get instant AI-powered answers!
+    This chatbot is powered by **Gemini GPT** to provide smart responses in real-time.
+    """)
 
-# Progress bar to simulate the response processing
-progress_bar = st.progress(0)
+    # Input area for the user's question
+    text = st.text_area("Enter Your Question Here", height=150, placeholder="Type your question...")
 
-# Initialize the model
-model = genai.GenerativeModel('gemini-pro')
-chat = model.start_chat(history=[])
+    # Progress bar to simulate the response processing
+    progress_bar = st.progress(0)
 
-# Trigger the response if there's input and the button is clicked
-if st.button("💬 Get Response"):
-    if text:
-        progress_bar.progress(50)  # Simulate loading
-        response = chat.send_message(text)
-        progress_bar.progress(100)  # Complete loading
-        
-        # Display the response directly below the question input
-        st.write(response.text)
-    else:
-        st.warning("Please enter a question!")
+    # Initialize the model
+    model = genai.GenerativeModel('gemini-pro')
+    chat = model.start_chat(history=[])
 
+    # Trigger the response if there's input and the button is clicked
+    if st.button("💬 Get Response"):
+        if text:
+            progress_bar.progress(50)  # Simulate loading
+            response = chat.send_message(text)
+            progress_bar.progress(100)  # Complete loading
+            
+            # Display the response directly below the question input
+            st.write(response.text)
+        else:
+            st.warning("Please enter a question!")
+
+# Image Generation Feature
+elif option == "Image Generation":
+    st.title("🖼️ Image Generation")
+    
+    API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0"
+    headers = {"Authorization": "Bearer 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"}
+
+    def query(payload):
+        response = requests.post(API_URL, headers=headers, json=payload)
+        return response.content
+
+    prompt = st.text_input("Enter the prompt:")
+    
+    if st.button("Generate Image"):
+        if prompt:
+            image_bytes = query({"inputs": prompt})
+            # Open the image with PIL
+            image = Image.open(io.BytesIO(image_bytes))
+            st.image(image, caption="Generated Image", use_column_width=True)
+        else:
+            st.warning("Please enter a prompt!")
+
+# Add a section for FAQs to assist users
 # Add a section for FAQs to assist users
 st.markdown("---")
 st.header("💡 Frequently Asked Questions (FAQs)")
 with st.expander("What can I ask this chatbot?"):
-    st.write("You can ask about any topic related to AI, technology, healthcare, education, or general knowledge.")
+    st.write("You can ask the chatbot questions about various topics, including technology, AI concepts, general knowledge, and educational content. It is designed to provide information and insights based on your queries.")
 with st.expander("How does this chatbot work?"):
-    st.write("The chatbot is powered by Gemini GPT, which generates responses based on the input question. It uses natural language processing to provide relevant answers.")
+    st.write("The chatbot leverages the capabilities of the Gemini GPT model, which uses advanced natural language processing techniques. It analyzes your questions and generates coherent and contextually relevant responses in real-time.")
 with st.expander("Can I get personalized advice?"):
-    st.write("While the chatbot can give general advice, it is not intended for personalized medical, financial, or legal advice.")
+    st.write("While the chatbot can provide general advice and information, it is not a substitute for professional guidance. For personalized advice in areas like healthcare, finance, or legal matters, please consult a qualified expert.")
